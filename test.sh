@@ -1,4 +1,5 @@
 #!/bin/bash
+#add test if amount of params >2
 echo "starting tests"
 path="$1"
 if ! [[ -d "$path" ]]; then
