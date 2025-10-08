@@ -27,4 +27,4 @@ for ((i=0; i<${#files[@]};i++))
     to_archivate+=("${files[$i]}")
 }
 tar -zcf "backup/archive.tar.gz" -C "$l" "${to_archivate[@]}"
-echo "archive.tar.gz in backups was succesfuly created"
+echo "archive.tar.gz in backups was succesfuly created" # опечатка "succesfully" 2 l.
