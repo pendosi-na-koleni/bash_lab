@@ -44,12 +44,16 @@ for (( i=0; i<${#files[@]}; i++ )); do
 done
 
 if [[ ${#to_archive[@]} -gt 0 ]]; then
-    echo "${#to_archive[@]} files will be archivated"
-    tar -zcf "backup/archive.tar.gz" -C "$dir" "${to_archive[@]}"
-    for file in "${to_archive[@]}"; do
-        rm -f "$dir/$file"
-    done
-    echo "archive was created successfully"
+    echo "${#to_archive[@]} files will be archived"
+    if tar -zcf "backup/archive.tar.gz" -C "$dir" "${to_archive[@]}"; then
+        echo "Archive created successfully"
+        for file in "${to_archive[@]}"; do
+            rm -f "$dir/$file"
+        done
+        echo "Archived files were deleted."
+    else
+        echo "Error: archiving failed, files were not deleted."
+    fi
 else
-    echo "No files were selected for archivating."
+    echo "No files were selected for archiving."
 fi
