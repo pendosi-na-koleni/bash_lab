@@ -1,8 +1,11 @@
 #!/bin/bash
 #removing prev files in prac/ n making 100 files new$i.txt with random sizes
-rm prac/*
 path="/home/mafaka/arcpr/prac/"
 l="${1:-$path}"
+if [[ ! -d "$l" ]]; then
+mkdir -p "$l"
+fi
+rm -rf "$l"/*
 for ((i = 0; i < 100; i++))
 {
 var=$((RANDOM % 27000))
@@ -15,5 +18,4 @@ home_dir=$(du -s "/home" | cut -f1)
 res=$(echo "scale=2; $cur_dir/$home_dir" | bc | cut -d. -f2)
 #getting percent
 echo result: $res
-
 
