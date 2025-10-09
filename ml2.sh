@@ -56,7 +56,7 @@ if [[ ${#to_archive[@]} -gt 0 ]]; then
         done
         echo "Archived files were deleted."
     else
-        echo "Error: archiving failed, files were not deleted."
+        echo "Archiving failed, files were not deleted."
     fi
 else
     echo "No files were selected for archiving."
