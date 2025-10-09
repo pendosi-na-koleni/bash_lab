@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 default_path="/home/mafaka/arcpr/prac/"
 default_threshold=14
 dir="${1:-$default_path}"
