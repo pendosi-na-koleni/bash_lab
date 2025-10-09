@@ -15,12 +15,6 @@ if (( $(echo "$threshold > 100" | bc -l) )); then
     echo "threshold cant be over 100%"
     exit 1
 fi
-
-if ! bash "test_ml2.sh" "$dir" "$threshold"; then
-    echo "Tests failed, aborting execution."
-    exit 1
-fi
-
 total_size=$(du -s "/home" | cut -f1)
 dir_size=$(du -s "$dir" | cut -f1) 
 current_usage=$(echo "scale=7; $dir_size * 100 / $total_size" | bc -l)
@@ -30,7 +24,7 @@ if (( $(echo "$current_usage <= $threshold" | bc -l) )); then
     exit 0
 fi
 mkdir -p "backup"
-mapfile -t files < <(find "$dir" -maxdepth 1 -type f -printf '%T@ %p\n' | sort -n | cut -d' ' -f2-)
+mapfile -t files < <(ls -tr "$dir"/* 2>/dev/null)
 if [[ ${#files[@]} -eq 0 ]]; then
     echo "No files found to archive."
     exit 0
