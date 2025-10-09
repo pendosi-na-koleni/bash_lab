@@ -15,6 +15,12 @@ if (( $(echo "$threshold > 100" | bc -l) )); then
     echo "threshold cant be over 100%"
     exit 1
 fi
+
+if ! bash "test_ml2.sh" "$dir" "$threshold"; then
+    echo "Tests failed, aborting execution."
+    exit 1
+fi
+
 total_size=$(du -s "/home" | cut -f1)
 dir_size=$(du -s "$dir" | cut -f1) 
 current_usage=$(echo "scale=7; $dir_size * 100 / $total_size" | bc -l)
