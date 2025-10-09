@@ -1,8 +1,8 @@
 #!/bin/bash
 path="/home/mafaka/arcpr/prac/"
 perc=20
-l="${1-:path}"
-n="${2-:perc}"
+l="${1-:$path}"
+n="${2-:$perc}"
 #if no input after executing choosing params by default
 #start test.sh
 if ! bash test.sh "$l" "$n"; then
@@ -27,4 +27,4 @@ for ((i=0; i<${#files[@]};i++))
     to_archivate+=("${files[$i]}")
 }
 tar -zcf "backup/archive.tar.gz" -C "$l" "${to_archivate[@]}"
-echo "archive.tar.gz in backups was succesfuly created"
+echo "archive.tar.gz in backups was successfully created"
