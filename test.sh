@@ -1,18 +1,19 @@
 #!/bin/bash
-#add test if amount of params >2
-echo "starting tests"
-path="$1"
-if ! [[ -d "$path" ]]; then
-echo "dir $path doesnt exist"
-exit 1
+echo "Начало тестов..."
+
+if [[ ! -d "$1" ]]; then
+    echo "Ошибка: папка '$1' не существует."
+    exit 1
 fi
-n="$2"
-if ! [[ "$n" =~ ^[0-9]+$ ]]; then
-echo "Error: percent must be integer"
-exit 1
+
+if ! [[ "$2" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+    echo "Ошибка: порог '$2' не является числом."
+    exit 1
 fi
-if [[ "$n" -lt 1 || "$n" -gt 100 ]]; then
-echo "Error: percent must be >=1 and <= 100"
-exit 1
+
+if (( $(bc <<< "$2 < 0") )) || (( $(bc <<< "$2 > 100") )); then
+    echo "Ошибка: порог должен быть от 0 до 100."
+    exit 1
 fi
-echo "all tests passed"
+
+echo "Все тесты пройдены."
