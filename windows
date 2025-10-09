@@ -1,0 +1,50 @@
+$DefaultFolder = "$HOME\Documents\logs"
+$threshold = Read-Host "Введите порог использования (%)"
+
+$folder = Read-Host "Введите путь к папке (или 'd' для значения по умолчанию)"
+if ($folder -eq 'd') { $folder = $DefaultFolder }
+
+while (-not (Test-Path $folder -PathType Container)) {
+    $folder = Read-Host "Папка не найдена. Введите другой путь"
+}
+
+$folderSize = (Get-ChildItem -Path $folder -Recurse -File | Measure-Object -Property Length -Sum).Sum
+
+$driveRoot = [System.IO.Path]::GetPathRoot($folder)
+$drive = [System.IO.DriveInfo]::new($driveRoot)
+$diskSize = $drive.TotalSize
+
+$usage = [Math]::Round($folderSize * 100.0 / $diskSize, 2)
+Write-Host "Папка занимает $usage% диска."
+
+if ($usage -gt $threshold) {
+    Write-Host "Превышение порога, архивируем старые файлы..."
+    $files = Get-ChildItem -Path $folder -File | Sort-Object LastWriteTime
+    $toArchive = @()
+    $currentSize = $folderSize
+
+    foreach ($file in $files) {
+        $fileSize = $file.Length
+        $newSize = $currentSize - $fileSize
+        $newUsage = [Math]::Round($newSize * 100.0 / $diskSize, 2)
+        $toArchive += $file.FullName
+        $currentSize = $newSize
+        if ($newUsage -le $threshold) {
+            Write-Host "Достигнут порог: новый процент = $newUsage%"
+            break
+        }
+    }
+
+    if ($toArchive.Count -eq 0) {
+        Write-Host "Нет файлов для архивации." -ForegroundColor Red
+        exit 1
+    }
+
+    $backupPath = Join-Path -Path $folder -ChildPath "backup"
+    New-Item -ItemType Directory -Path $backupPath -Force | Out-Null
+    $zipFile = Join-Path $backupPath "archive.zip"
+    Compress-Archive -Path $toArchive -DestinationPath $zipFile -Force
+    Write-Host "Файлы заархивированы в $zipFile"
+} else {
+    Write-Host "Порог не превышен. Архивация не требуется."
+}
