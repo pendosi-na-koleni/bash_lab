@@ -1,48 +1,50 @@
 #!/bin/bash
 # tests for ml2.sh script
 
-# тест 1 (директория существует).
-path="$1"
-if ! [[ -d "$path" ]]; then
-    echo "Error: directory '$path' doesn't exist"
-    exit 1
-fi
+dir="/home/mafaka/arcpr/prac"
+dir_not_exist="/home/mafaka/not_exist"
+dir_empty="/home/mafaka/empty"
+backup="/home/mafaka/arcpr/prac/backup"
 
-# тест 2 (проверка валидности процента).
-threshold="$2"
-if ! [[ "$threshold" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
-    echo "Error: threshold must be a positive number"
-    exit 1
-fi
+mkdir -p "$dir"
+mkdir -p "$dir_empty"
+mkdir -p "$backup"
+touch "$dir/file1.txt" "$dir/file2.txt" # + создаём 2 файла
 
-# тест 3 (проверка, что процент от 0 до 100).
-if (( $(echo "$threshold <= 0" | bc -l 2>/dev/null) )); then
-    echo "Error: threshold must be greater than 0"
-    exit 1
-fi
+# test 1 (папки нет).
+echo "test 1: directory does not exist."
+echo "================================="
+./ml2.sh "$dir_not_exist" 10
+echo "================================="
+echo -e "Test 1 completed\n"
 
-# тест 4 (проверка, что процент от 0 до 100 - вторая часть).
-if (( $(echo "$threshold > 100" | bc -l 2>/dev/null) )); then
-    echo "Error: threshold cannot be over 100%"
-    exit 1
-fi
+# test 2 (процент указан не число).
+echo "test 2: threshold is not numeric."
+echo "================================="
+./ml2.sh "$dir" "opps I did it again"
+echo "================================="
+echo -e "Test 2 completed\n"
 
-# тест 5 (проверка, что bc есть и функционирует - запускаю числа с пл. запятой).
-if ! command -v bc &> /dev/null; then
-    echo "Error: 'bc' calculator is required but not installed"
-    exit 1
-fi
+# test 3 (процент не соотв. запросу).
+echo "test 3: threshold is not in range (0,100)."
+echo "================================="
+./ml2.sh "$dir" 101
+echo "================================="
+echo -e "Test 3 completed\n"
 
-# тест 6 (проверка, путь к папке есть и он читаемый).
-if ! [[ -r "$path" ]]; then
-    echo "Error: directory '$path' is not readable"
-    exit 1
-fi
+# test 4 (папка пустая).
+echo "test 4: directory is empty."
+echo "================================="
+./ml2.sh "$dir_empty" 10
+echo "================================="
+echo -e "Test 4 completed\n"
 
-# тест 7 (проверка, что папка доступна и с ней можно работать).
-if ! [[ -x "$path" ]]; then
-    echo "Error: directory '$path' is not accessible"
-    exit 1
-fi
+# test 5 (успешный запуск кода).
+echo "test 5: everything is fine."
+echo "================================="
+./ml2.sh "$dir" 0.01
+echo "================================="
+echo -e "Test 5 completed\n"
 
-echo "All tests passed for ml2.sh"
+rm -rf "$dir_empty" "$backup"
+rm -f "$dir/file1.txt" "$dir/file2.txt"
