@@ -16,7 +16,7 @@ if (( $(echo "$threshold > 100" | bc -l) )); then
     exit 1
 fi
 total_size=$(du -s "/home" | cut -f1)
-dir_size=$(du -s "$dir" | cut -f1)
+dir_size=$(du -s "$dir" | cut -f1) 
 current_usage=$(echo "scale=7; $dir_size * 100 / $total_size" | bc -l)
 echo "usage: $(printf "%.2f" "$current_usage")%"
 if (( $(echo "$current_usage <= $threshold" | bc -l) )); then
@@ -33,15 +33,16 @@ to_archive=()
 archived_size=0
 for (( i=0; i<${#files[@]}; i++ )); do
     file="${files[$i]}"
-    file_size=$(stat -c%s "$file" 2>/dev/null || du -sb "$file" | awk '{print $1}')
+    file_size=$(du -s "$file" | cut -f1)
     to_archive+=("$(basename "$file")")
     archived_size=$((archived_size + file_size))
     new_usage=$(echo "scale=7; ($dir_size - $archived_size) * 100 / $total_size" | bc -l)
     if (( $(echo "$new_usage <= $threshold" | bc -l) )); then
- 	echo "Target usage reached: $(printf "%.2f" "$new_usage")%"
+        echo "Target usage reached: $(printf "%.2f" "$new_usage")%"
         break
     fi
 done
+
 if [[ ${#to_archive[@]} -gt 0 ]]; then
     echo "${#to_archive[@]} files will be archivated"
     tar -zcf "backup/archive.tar.gz" -C "$dir" "${to_archive[@]}"
@@ -52,4 +53,3 @@ if [[ ${#to_archive[@]} -gt 0 ]]; then
 else
     echo "No files were selected for archivating."
 fi
-
