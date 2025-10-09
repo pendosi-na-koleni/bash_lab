@@ -12,7 +12,6 @@ var=$((RANDOM % 27000))
 res=$(head -n $var data.txt)
 echo $res > "/home/mafaka/arcpr/prac/new$i.txt"
 }
-l="/home/mafaka/arcpr/prac/"
 cur_dir=$(du -s "$l" | cut -f1)
 home_dir=$(du -s "/home" | cut -f1)
 res=$(echo "scale=2; $cur_dir/$home_dir" | bc | cut -d. -f2)
