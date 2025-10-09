@@ -1,6 +1,6 @@
-#!/bin/bash
+!/bin/bash
 default_path="/home/mafaka/arcpr/prac/"
-default_threshold=20
+default_threshold=14
 dir="${1:-$default_path}"
 threshold="${2:-$default_threshold}"
 if [[ ! -d "$dir" ]]; then
@@ -13,10 +13,6 @@ if ! [[ "$threshold" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
 fi
 if (( $(echo "$threshold > 100" | bc -l) )); then
     echo "threshold cant be over 100%"
-    exit 1
-fi
-if (( $(echo "$threshold <= 0" | bc -l) )); then
-    echo "Threshold must be positive and non-zero."
     exit 1
 fi
 total_size=$(du -s "/home" | cut -f1)
@@ -48,16 +44,12 @@ for (( i=0; i<${#files[@]}; i++ )); do
 done
 
 if [[ ${#to_archive[@]} -gt 0 ]]; then
-    echo "${#to_archive[@]} files will be archived"
-    if tar -zcf "backup/archive.tar.gz" -C "$dir" "${to_archive[@]}"; then
-        echo "Archive created successfully"
-        for file in "${to_archive[@]}"; do
-            rm -f "$dir/$file"
-        done
-        echo "Archived files were deleted."
-    else
-        echo "Archiving failed, files were not deleted."
-    fi
+    echo "${#to_archive[@]} files will be archivated"
+    tar -zcf "backup/archive.tar.gz" -C "$dir" "${to_archive[@]}"
+    for file in "${to_archive[@]}"; do
+        rm -f "$dir/$file"
+    done
+    echo "archive was created successfully"
 else
-    echo "No files were selected for archiving."
+    echo "No files were selected for archivating."
 fi
