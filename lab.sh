@@ -10,6 +10,17 @@ while true; do
 	fi
 done
 
+get_usage()
+{
+	local dir=$1
+	local total_size=$(df --output=size "$dir" | tail -n 1)
+	local dir_size=$(sudo du -s "$dir" | awk '{print $1}')
+
+	percentage=$(printf "%.2f" "$(echo "scale=10; $dir_size / $total_size * 100" | bc)")
+	echo "$percentage"
+}
+echo "Current usage is $(get_usage "$dir")%"
+
 #check >0
 echo "Enter the threshold for the directory usage in percentage"
 while true; do
@@ -38,16 +49,6 @@ while true; do
 		fi
 	fi
 done
-
-get_usage()
-{
-	local dir=$1
-	local total_size=$(df --output=size "$dir" | tail -n 1)
-	local dir_size=$(sudo du -s "$dir" | awk '{print $1}')
-
-	percentage=$(printf "%.2f" "$(echo "scale=10; $dir_size / $total_size * 100" | bc)")
-	echo "$percentage"
-}
 
 if [ "$(echo "$(get_usage "$dir") > $max_usage" | bc -l)" = "1" ]; then
 	echo "Usage exceeded the threshold too much. Enter the path to backup directory"
